@@ -29,7 +29,7 @@ WORKDIR /var/www/site2
 # Copy Laravel files into the container
 COPY . .
 
-# RUN composer install --ignore-platform-reqs
+RUN composer install --ignore-platform-reqs
 
 # Donner les permissions d'exécution au script
 RUN chmod +x migrate+npm.sh 
