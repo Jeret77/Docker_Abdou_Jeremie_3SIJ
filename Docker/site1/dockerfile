@@ -15,9 +15,6 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 # Install Node.js
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs
 
@@ -25,10 +22,13 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -
 # Set working directory
 WORKDIR /var/www/site1
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 # Copy Laravel files into the container
 COPY . .
 
-RUN composer install --ignore-platform-reqs
+# RUN composer install --ignore-platform-reqs
 
 # Donner les permissions d'exécution au script
 RUN chmod +x migrate+npm.sh 
