@@ -1,0 +1,41 @@
+FROM php:8.2-fpm
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl
+
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install Node.js
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs
+
+
+# Set working directory
+WORKDIR /var/www/site1
+
+# Copy Laravel files into the container
+COPY . .
+
+RUN composer install --ignore-platform-reqs
+
+# Donner les permissions d'exécution au script
+RUN chmod +x migrate+npm.sh 
+
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
+
+
+# Command to run PHP-FPM and your script
+CMD ["sh", "-c", "./migrate+npm.sh && php-fpm"]
